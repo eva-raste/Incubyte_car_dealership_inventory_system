@@ -1,5 +1,6 @@
 package com.car_inventory.backend;
 
+import com.car_inventory.backend.dto.LoginRequest;
 import com.car_inventory.backend.entity.Role;
 import com.car_inventory.backend.entity.User;
 import com.car_inventory.backend.repository.UserRepository;
@@ -10,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -88,5 +91,31 @@ class AuthServiceTest {
         assertEquals("encodedPassword", savedUser.getPassword());
 
         verify(passwordEncoder).encode("password123");
+    }
+
+    @Test
+    void shouldLoginSuccessfully() {
+
+        User user = User.builder()
+                .name("Eva")
+                .email("eva@gmail.com")
+                .password("encodedPassword")
+                .role(Role.USER)
+                .build();
+
+        LoginRequest request = new LoginRequest();
+        request.setEmail("eva@gmail.com");
+        request.setPassword("password123");
+
+        when(userRepository.findByEmail("eva@gmail.com"))
+                .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.matches("password123", "encodedPassword"))
+                .thenReturn(true);
+
+        User loggedInUser = authService.login(request);
+
+        assertNotNull(loggedInUser);
+        assertEquals("eva@gmail.com", loggedInUser.getEmail());
     }
 }
