@@ -38,6 +38,30 @@ public class VehicleService {
                 .toList();
     }
 
+    public VehicleResponse updateVehicle(Long id, VehicleRequest request) {
+
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
+        vehicle.setMake(request.getMake());
+        vehicle.setModel(request.getModel());
+        vehicle.setCategory(request.getCategory());
+        vehicle.setPrice(request.getPrice());
+        vehicle.setQuantity(request.getQuantity());
+
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+
+        return mapToResponse(updatedVehicle);
+    }
+
+    public void deleteVehicle(Long id) {
+
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
+        vehicleRepository.delete(vehicle);
+    }
+
     private VehicleResponse mapToResponse(Vehicle vehicle) {
 
         return VehicleResponse.builder()
