@@ -1,5 +1,6 @@
 package com.car_inventory.backend.service;
 
+import com.car_inventory.backend.dto.RestockRequest;
 import com.car_inventory.backend.dto.VehicleRequest;
 import com.car_inventory.backend.dto.VehicleResponse;
 import com.car_inventory.backend.entity.Category;
@@ -106,6 +107,22 @@ public class VehicleService {
         return mapToResponse(updatedVehicle);
     }
 
+    public VehicleResponse restockVehicle(
+            Long id,
+            RestockRequest request) {
+
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Vehicle not found"));
+
+        vehicle.setQuantity(
+                vehicle.getQuantity() + request.getQuantity());
+
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+
+        return mapToResponse(updatedVehicle);
+    }
+    
     private VehicleResponse mapToResponse(Vehicle vehicle) {
 
         return VehicleResponse.builder()

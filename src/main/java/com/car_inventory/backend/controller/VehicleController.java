@@ -1,4 +1,5 @@
 package com.car_inventory.backend.controller;
+import com.car_inventory.backend.dto.RestockRequest;
 import com.car_inventory.backend.dto.VehicleRequest;
 import com.car_inventory.backend.dto.VehicleResponse;
 import com.car_inventory.backend.entity.Category;
@@ -91,4 +92,18 @@ public class VehicleController {
                 vehicleService.purchaseVehicle(id)
         );
     }
+
+    @PostMapping("/{id}/restock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<VehicleResponse> restockVehicle(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody RestockRequest request) {
+
+        return ResponseEntity.ok(
+                vehicleService.restockVehicle(id, request)
+        );
+    }
+
 }
