@@ -1,5 +1,6 @@
 package com.car_inventory.backend.security;
 
+import com.car_inventory.backend.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -25,12 +28,21 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email) {
+    public String generateToken(
+            String email,
+            Role role
+    ) {
+
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("role", role.name());
 
         return Jwts.builder()
+                .claims(claims)
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(
+                        System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -61,5 +73,13 @@ public class JwtService {
 
         return extractClaim(token,
                 Claims::getExpiration).before(new Date());
+    }
+
+    public String extractRole(String token) {
+
+        return extractClaim(
+                token,
+                claims -> claims.get("role", String.class)
+        );
     }
 }

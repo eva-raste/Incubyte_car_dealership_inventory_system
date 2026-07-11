@@ -32,7 +32,7 @@ public class AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
-        String token = jwtService.generateToken(savedUser.getEmail());
+        String token = jwtService.generateToken(savedUser.getEmail(),user.getRole());
 
         return AuthResponse.builder()
                 .id(savedUser.getId())
@@ -51,7 +51,7 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
-        String token = jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(user.getEmail(),user.getRole());
 
         return AuthResponse.builder()
                 .id(user.getId())
