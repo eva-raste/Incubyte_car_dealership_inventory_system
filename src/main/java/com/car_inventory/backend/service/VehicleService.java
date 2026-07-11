@@ -5,6 +5,8 @@ import com.car_inventory.backend.dto.VehicleRequest;
 import com.car_inventory.backend.dto.VehicleResponse;
 import com.car_inventory.backend.entity.Category;
 import com.car_inventory.backend.entity.Vehicle;
+import com.car_inventory.backend.exception.OutOfStockException;
+import com.car_inventory.backend.exception.ResourceNotFoundException;
 import com.car_inventory.backend.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,7 @@ public class VehicleService {
     public VehicleResponse updateVehicle(Long id, VehicleRequest request) {
 
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
 
         vehicle.setMake(request.getMake());
         vehicle.setModel(request.getModel());
@@ -60,7 +62,7 @@ public class VehicleService {
     public void deleteVehicle(Long id) {
 
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
 
         vehicleRepository.delete(vehicle);
     }
@@ -94,10 +96,10 @@ public class VehicleService {
 
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Vehicle not found"));
+                        new ResourceNotFoundException("Vehicle not found"));
 
         if (vehicle.getQuantity() == 0) {
-            throw new RuntimeException("Vehicle is out of stock");
+            throw new OutOfStockException("Vehicle is out of stock");
         }
 
         vehicle.setQuantity(vehicle.getQuantity() - 1);

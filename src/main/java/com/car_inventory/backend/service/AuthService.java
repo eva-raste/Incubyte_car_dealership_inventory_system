@@ -5,6 +5,8 @@ import com.car_inventory.backend.dto.LoginRequest;
 import com.car_inventory.backend.dto.RegisterRequest;
 import com.car_inventory.backend.entity.Role;
 import com.car_inventory.backend.entity.User;
+import com.car_inventory.backend.exception.InvalidCredentialsException;
+import com.car_inventory.backend.exception.ResourceAlreadyExistsException;
 import com.car_inventory.backend.repository.UserRepository;
 import com.car_inventory.backend.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ResourceAlreadyExistsException("Email already exists");
         }
 
         User user = User.builder()
@@ -49,7 +51,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
         String token = jwtService.generateToken(user.getEmail(),user.getRole());
 
