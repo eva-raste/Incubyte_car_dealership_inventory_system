@@ -64,18 +64,6 @@ public class VehicleService {
         vehicleRepository.delete(vehicle);
     }
 
-    private VehicleResponse mapToResponse(Vehicle vehicle) {
-
-        return VehicleResponse.builder()
-                .id(vehicle.getId())
-                .make(vehicle.getMake())
-                .model(vehicle.getModel())
-                .category(vehicle.getCategory())
-                .price(vehicle.getPrice())
-                .quantity(vehicle.getQuantity())
-                .build();
-    }
-
     public List<VehicleResponse> searchVehicles(String make,
                                                 String model,
                                                 Category category,
@@ -99,5 +87,34 @@ public class VehicleService {
         return vehicles.stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    public VehicleResponse purchaseVehicle(Long id) {
+
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Vehicle not found"));
+
+        if (vehicle.getQuantity() == 0) {
+            throw new RuntimeException("Vehicle is out of stock");
+        }
+
+        vehicle.setQuantity(vehicle.getQuantity() - 1);
+
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+
+        return mapToResponse(updatedVehicle);
+    }
+
+    private VehicleResponse mapToResponse(Vehicle vehicle) {
+
+        return VehicleResponse.builder()
+                .id(vehicle.getId())
+                .make(vehicle.getMake())
+                .model(vehicle.getModel())
+                .category(vehicle.getCategory())
+                .price(vehicle.getPrice())
+                .quantity(vehicle.getQuantity())
+                .build();
     }
 }
