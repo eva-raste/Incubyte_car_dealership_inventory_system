@@ -122,7 +122,6 @@ public class VehicleService {
 
         return mapToResponse(updatedVehicle);
     }
-    
     private VehicleResponse mapToResponse(Vehicle vehicle) {
 
         return VehicleResponse.builder()
