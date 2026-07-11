@@ -1,5 +1,6 @@
 package com.car_inventory.backend.service;
 
+import com.car_inventory.backend.dto.RestockRequest;
 import com.car_inventory.backend.dto.VehicleRequest;
 import com.car_inventory.backend.dto.VehicleResponse;
 import com.car_inventory.backend.entity.Category;
@@ -208,6 +209,29 @@ class VehicleServiceTest {
 
         assertEquals("Vehicle is out of stock",
                 exception.getMessage());
+    }
+
+    @Test
+    void shouldRestockVehicle() {
+
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .quantity(5)
+                .build();
+
+        when(vehicleRepository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        when(vehicleRepository.save(any(Vehicle.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        RestockRequest request = new RestockRequest();
+        request.setQuantity(10);
+
+        VehicleResponse response =
+                vehicleService.restockVehicle(1L, request);
+
+        assertEquals(15, response.getQuantity());
     }
 }
 
