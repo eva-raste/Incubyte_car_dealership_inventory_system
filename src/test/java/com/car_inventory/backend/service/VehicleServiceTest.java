@@ -164,5 +164,50 @@ class VehicleServiceTest {
         assertEquals(1, response.size());
         assertEquals("Toyota", response.get(0).getMake());
     }
+
+    @Test
+    void shouldPurchaseVehicle() {
+
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .category(Category.SUV)
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(5)
+                .build();
+
+        when(vehicleRepository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        when(vehicleRepository.save(any(Vehicle.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        VehicleResponse response = vehicleService.purchaseVehicle(1L);
+
+        assertEquals(4, response.getQuantity());
+
+        verify(vehicleRepository).save(vehicle);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenVehicleIsOutOfStock() {
+
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .quantity(0)
+                .build();
+
+        when(vehicleRepository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> vehicleService.purchaseVehicle(1L)
+        );
+
+        assertEquals("Vehicle is out of stock",
+                exception.getMessage());
+    }
 }
 
