@@ -118,4 +118,44 @@ class AuthServiceTest {
         assertNotNull(loggedInUser);
         assertEquals("eva@gmail.com", loggedInUser.getEmail());
     }
+
+    @Test
+    void shouldThrowExceptionWhenEmailDoesNotExist() {
+
+        LoginRequest request = new LoginRequest();
+        request.setEmail("abc@gmail.com");
+        request.setPassword("password123");
+
+        when(userRepository.findByEmail("abc@gmail.com"))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> authService.login(request));
+
+        assertEquals("Invalid email or password", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordIsIncorrect() {
+
+        User user = User.builder()
+                .email("eva@gmail.com")
+                .password("encodedPassword")
+                .build();
+
+        LoginRequest request = new LoginRequest();
+        request.setEmail("eva@gmail.com");
+        request.setPassword("wrongPassword");
+
+        when(userRepository.findByEmail("eva@gmail.com"))
+                .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.matches("wrongPassword", "encodedPassword"))
+                .thenReturn(false);
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> authService.login(request));
+
+        assertEquals("Invalid email or password", exception.getMessage());
+    }
 }
