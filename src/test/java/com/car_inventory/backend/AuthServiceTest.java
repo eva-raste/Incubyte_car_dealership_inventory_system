@@ -13,7 +13,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
@@ -40,5 +42,26 @@ class AuthServiceTest {
         assertEquals("Eva", savedUser.getName());
         assertEquals("eva@gmail.com", savedUser.getEmail());
         assertEquals(Role.USER, savedUser.getRole());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEmailAlreadyExists() {
+
+        User user = User.builder()
+                .name("Eva")
+                .email("eva@gmail.com")
+                .password("password123")
+                .role(Role.USER)
+                .build();
+
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            authService.register(user);
+        });
+
+        assertEquals("Email already exists", exception.getMessage());
+
+        verify(userRepository, never()).save(any(User.class));
     }
 }

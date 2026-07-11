@@ -13,6 +13,10 @@ public class AuthService {
 
     public User register(User user) {
 
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         user.setRole(Role.USER);
 
         return userRepository.save(user);
