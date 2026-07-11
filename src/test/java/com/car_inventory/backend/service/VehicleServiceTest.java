@@ -137,5 +137,32 @@ class VehicleServiceTest {
                 exception.getMessage());
     }
 
+    @Test
+    void shouldSearchVehicleByMake() {
+
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .category(Category.SUV)
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(5)
+                .build();
+
+        when(vehicleRepository.findByMakeContainingIgnoreCase("Toyota"))
+                .thenReturn(List.of(vehicle));
+
+        List<VehicleResponse> response =
+                vehicleService.searchVehicles(
+                        "Toyota",
+                        null,
+                        null,
+                        null,
+                        null
+                );
+
+        assertEquals(1, response.size());
+        assertEquals("Toyota", response.get(0).getMake());
+    }
 }
 
