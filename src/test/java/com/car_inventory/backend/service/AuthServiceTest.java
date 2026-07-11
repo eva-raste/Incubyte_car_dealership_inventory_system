@@ -1,10 +1,11 @@
-package com.car_inventory.backend;
+package com.car_inventory.backend.service;
 
+import com.car_inventory.backend.dto.AuthResponse;
 import com.car_inventory.backend.dto.LoginRequest;
+import com.car_inventory.backend.dto.RegisterRequest;
 import com.car_inventory.backend.entity.Role;
 import com.car_inventory.backend.entity.User;
 import com.car_inventory.backend.repository.UserRepository;
-import com.car_inventory.backend.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,15 +33,14 @@ class AuthServiceTest {
     @Test
     void shouldRegisterUser() {
 
-        User user = User.builder()
-                .name("Eva")
-                .email("eva@gmail.com")
-                .password("password123")
-                .role(Role.USER)
-                .build();
+        RegisterRequest request = new RegisterRequest();
+        request.setName("Eva");
+        request.setEmail("eva@gmail.com");
+        request.setPassword("password123");
+
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        User savedUser = authService.register(user);
+        AuthResponse savedUser = authService.register(request);
 
         assertNotNull(savedUser);
         assertEquals("Eva", savedUser.getName());
@@ -51,17 +51,15 @@ class AuthServiceTest {
     @Test
     void shouldThrowExceptionWhenEmailAlreadyExists() {
 
-        User user = User.builder()
-                .name("Eva")
-                .email("eva@gmail.com")
-                .password("password123")
-                .role(Role.USER)
-                .build();
+        RegisterRequest request = new RegisterRequest();
+        request.setName("Eva");
+        request.setEmail("eva@gmail.com");
+        request.setPassword("password123");
 
-        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            authService.register(user);
+            authService.register(request);
         });
 
         assertEquals("Email already exists", exception.getMessage());
@@ -72,13 +70,12 @@ class AuthServiceTest {
     @Test
     void shouldEncodePasswordBeforeSaving() {
 
-        User user = User.builder()
-                .name("Eva")
-                .email("eva@gmail.com")
-                .password("password123")
-                .build();
+        RegisterRequest request = new RegisterRequest();
+        request.setName("Eva");
+        request.setEmail("eva@gmail.com");
+        request.setPassword("password123");
 
-        when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
 
         when(passwordEncoder.encode("password123"))
                 .thenReturn("encodedPassword");
@@ -86,11 +83,13 @@ class AuthServiceTest {
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        User savedUser = authService.register(user);
-
-        assertEquals("encodedPassword", savedUser.getPassword());
+        authService.register(request);
 
         verify(passwordEncoder).encode("password123");
+
+        verify(userRepository).save(argThat(user ->
+                user.getPassword().equals("encodedPassword")
+        ));
     }
 
     @Test
@@ -113,7 +112,7 @@ class AuthServiceTest {
         when(passwordEncoder.matches("password123", "encodedPassword"))
                 .thenReturn(true);
 
-        User loggedInUser = authService.login(request);
+        AuthResponse loggedInUser = authService.login(request);
 
         assertNotNull(loggedInUser);
         assertEquals("eva@gmail.com", loggedInUser.getEmail());
