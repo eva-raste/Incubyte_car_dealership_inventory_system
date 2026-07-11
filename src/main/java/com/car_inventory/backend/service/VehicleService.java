@@ -2,11 +2,13 @@ package com.car_inventory.backend.service;
 
 import com.car_inventory.backend.dto.VehicleRequest;
 import com.car_inventory.backend.dto.VehicleResponse;
+import com.car_inventory.backend.entity.Category;
 import com.car_inventory.backend.entity.Vehicle;
 import com.car_inventory.backend.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -72,5 +74,30 @@ public class VehicleService {
                 .price(vehicle.getPrice())
                 .quantity(vehicle.getQuantity())
                 .build();
+    }
+
+    public List<VehicleResponse> searchVehicles(String make,
+                                                String model,
+                                                Category category,
+                                                BigDecimal minPrice,
+                                                BigDecimal maxPrice) {
+
+        List<Vehicle> vehicles;
+
+        if (make != null) {
+            vehicles = vehicleRepository.findByMakeContainingIgnoreCase(make);
+        } else if (model != null) {
+            vehicles = vehicleRepository.findByModelContainingIgnoreCase(model);
+        } else if (category != null) {
+            vehicles = vehicleRepository.findByCategory(category);
+        } else if (minPrice != null && maxPrice != null) {
+            vehicles = vehicleRepository.findByPriceBetween(minPrice, maxPrice);
+        } else {
+            vehicles = vehicleRepository.findAll();
+        }
+
+        return vehicles.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 }
