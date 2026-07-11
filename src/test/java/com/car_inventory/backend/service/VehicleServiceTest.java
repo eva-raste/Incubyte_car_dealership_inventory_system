@@ -76,7 +76,66 @@ class VehicleServiceTest {
         assertEquals("Toyota", response.get(0).getMake());
     }
 
+    @Test
+    void shouldUpdateVehicle() {
 
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .make("Toyota")
+                .model("Fortuner")
+                .category(Category.SUV)
+                .price(BigDecimal.valueOf(4500000))
+                .quantity(10)
+                .build();
+
+        VehicleRequest request = new VehicleRequest();
+        request.setMake("BMW");
+        request.setModel("X5");
+        request.setCategory(Category.SUV);
+        request.setPrice(BigDecimal.valueOf(9000000));
+        request.setQuantity(5);
+
+        when(vehicleRepository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        when(vehicleRepository.save(any(Vehicle.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        VehicleResponse response =
+                vehicleService.updateVehicle(1L, request);
+
+        assertEquals("BMW", response.getMake());
+        assertEquals("X5", response.getModel());
+    }
+
+    @Test
+    void shouldDeleteVehicle() {
+
+        Vehicle vehicle = Vehicle.builder()
+                .id(1L)
+                .build();
+
+        when(vehicleRepository.findById(1L))
+                .thenReturn(Optional.of(vehicle));
+
+        vehicleService.deleteVehicle(1L);
+
+        verify(vehicleRepository).delete(vehicle);
+    }
+
+    @Test
+    void shouldThrowWhenVehicleNotFound() {
+
+        when(vehicleRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception =
+                assertThrows(RuntimeException.class,
+                        () -> vehicleService.deleteVehicle(1L));
+
+        assertEquals("Vehicle not found",
+                exception.getMessage());
+    }
 
 }
 
