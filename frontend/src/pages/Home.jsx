@@ -2,17 +2,23 @@ import { useEffect, useState } from "react";
 import {
     getAllVehicles,
     purchaseVehicle,
-    searchVehicles
+    searchVehicles,
+    deleteVehicle,
+    restockVehicle
 } from "../api/vehicleApi";
+
 import VehicleCard from "../components/VehicleCard";
 import VehicleForm from "../components/VehicleForm";
 import SearchBar from "../components/SearchBar";
+
 import { toast } from "react-toastify";
 
 function Home() {
 
     const [vehicles, setVehicles] = useState([]);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+    const role = localStorage.getItem("role");
 
     useEffect(() => {
         loadVehicles();
@@ -28,7 +34,7 @@ function Home() {
 
             setSelectedVehicle(null);
 
-        } catch (error) {
+        } catch {
 
             toast.error("Unable to load vehicles.");
 
@@ -73,11 +79,12 @@ function Home() {
 
             });
 
-            const data = await searchVehicles(cleanedFilters);
+            const data =
+                await searchVehicles(cleanedFilters);
 
             setVehicles(data);
 
-        } catch (error) {
+        } catch {
 
             toast.error("Search failed.");
 
@@ -90,9 +97,54 @@ function Home() {
         setSelectedVehicle(vehicle);
 
         window.scrollTo({
+
             top: 0,
+
             behavior: "smooth"
+
         });
+
+    };
+
+    const handleDelete = async (id) => {
+
+        try {
+
+            await deleteVehicle(id);
+
+            toast.success("Vehicle deleted.");
+
+            loadVehicles();
+
+        } catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Delete failed."
+            );
+
+        }
+
+    };
+
+    const handleRestock = async (id, quantity) => {
+
+        try {
+
+            await restockVehicle(id, quantity);
+
+            toast.success("Vehicle restocked.");
+
+            loadVehicles();
+
+        } catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Restock failed."
+            );
+
+        }
 
     };
 
@@ -100,17 +152,29 @@ function Home() {
 
         <div className="container">
 
-            <h2 style={{ marginTop: "20px" }}>
+            <h2
+                style={{
+                    marginTop: "20px"
+                }}
+            >
                 Available Vehicles
             </h2>
 
-            <VehicleForm
-                isEdit={selectedVehicle !== null}
-                vehicle={selectedVehicle}
-                onVehicleAdded={loadVehicles}
-            />
+            {
+                role === "ADMIN" && (
 
-            <SearchBar onSearch={handleSearch} />
+                    <VehicleForm
+                        isEdit={selectedVehicle !== null}
+                        vehicle={selectedVehicle}
+                        onVehicleAdded={loadVehicles}
+                    />
+
+                )
+            }
+
+            <SearchBar
+                onSearch={handleSearch}
+            />
 
             <div
                 style={{
@@ -119,16 +183,29 @@ function Home() {
                 }}
             >
 
-                {vehicles.map(vehicle => (
+                {
+                    vehicles.map(vehicle => (
 
-                    <VehicleCard
-                        key={vehicle.id}
-                        vehicle={vehicle}
-                        onPurchase={handlePurchase}
-                        onEdit={handleEdit}
-                    />
+                        <VehicleCard
 
-                ))}
+                            key={vehicle.id}
+
+                            vehicle={vehicle}
+
+                            role={role}
+
+                            onPurchase={handlePurchase}
+
+                            onEdit={handleEdit}
+
+                            onDelete={handleDelete}
+
+                            onRestock={handleRestock}
+
+                        />
+
+                    ))
+                }
 
             </div>
 

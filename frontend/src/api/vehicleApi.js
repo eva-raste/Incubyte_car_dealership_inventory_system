@@ -80,3 +80,37 @@ export const updateVehicle = async (id, vehicle) => {
 
     return response.data;
 };
+
+export const deleteVehicle = async (id) => {
+
+    const token = localStorage.getItem("token");
+
+    return axios.delete(`/vehicles/${id}`,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+    });
+
+};
+
+export const restockVehicle = async (id,quantity)=>{
+
+    const token = localStorage.getItem("token");
+
+    return axios.post(
+
+        `/vehicles/${id}/restock`,
+
+        {
+            quantity
+        },
+
+        {
+            headers:{
+                Authorization:`Bearer ${token}`
+            }
+        }
+
+    );
+
+};
