@@ -356,16 +356,10 @@ Frontend
 
 # 📸 Screenshots
 
-- Login Page
-- Register Page
-- Vehicle Dashboard
-- Search Vehicles
-- Admin Dashboard
-- Add Vehicle
-- Update Vehicle
-- Purchase Vehicle
+![img_1.png](img_1.png)
+![img.png](screenshots/img.png)
+![img_2.png](img_2.png)
 
-*(Add screenshots after deployment.)*
 
 ---
 
