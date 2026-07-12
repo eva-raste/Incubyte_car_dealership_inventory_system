@@ -50,17 +50,6 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
-        System.out.println("Entered Password : " + request.getPassword());
-
-        System.out.println("Stored Password  : " + user.getPassword());
-
-        System.out.println(
-                "Password Match : " +
-                        passwordEncoder.matches(
-                                request.getPassword(),
-                                user.getPassword()
-                        )
-        );
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid email or password");
         }

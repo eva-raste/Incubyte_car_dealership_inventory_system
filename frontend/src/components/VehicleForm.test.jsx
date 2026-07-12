@@ -5,7 +5,7 @@ test("renders add vehicle form", () => {
 
     render(<VehicleForm />);
 
-    expect(screen.getByText(/add vehicle/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /add vehicle/i })).toBeInTheDocument();
 
 });
 

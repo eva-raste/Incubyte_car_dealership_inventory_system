@@ -24,15 +24,13 @@ function Login() {
             const response = await login(form);
             toast.success(response.data.message || "Login Successful");
             
-            // Save token and user name
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("username", response.data.name || form.email);
-            localStorage.setItem("role", response.data.role);
+            
             setForm({
                 email: "",
                 password: ""
             });
-            console.log()
             navigate("/home");
         } catch (err) {
             toast.error(err.response?.data?.message || "Login Failed");
@@ -41,25 +39,35 @@ function Login() {
 
     return (
         <div className="auth-container">
-            <form className="auth-card" onSubmit={handleSubmit}>
-                <h2>Login</h2>
-                <input
-                    name="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                />
-                <button>Login</button>
-                <p style={{ marginTop: "15px", textAlign: "center", color: "#666" }}>
+            <form className="glass-panel" onSubmit={handleSubmit}>
+                <h2>Welcome Back</h2>
+                
+                <div className="input-group">
+                    <input
+                        className="glass-input"
+                        name="email"
+                        placeholder="Email Address"
+                        value={form.email}
+                        onChange={handleChange}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input
+                        className="glass-input"
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                    />
+                </div>
+                
+                <button className="btn-primary">Login</button>
+                
+                <div className="form-footer">
                     Don't have an account? <Link to="/register">Register</Link>
-                </p>
+                </div>
             </form>
         </div>
     );

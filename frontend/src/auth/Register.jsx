@@ -37,31 +37,45 @@ function Register() {
 
     return (
         <div className="auth-container">
-            <form className="auth-card" onSubmit={handleSubmit}>
+            <form className="glass-panel" onSubmit={handleSubmit}>
                 <h2>Create Account</h2>
-                <input
-                    name="name"
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={handleChange}
-                />
-                <input
-                    name="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                />
-                <button>Create Account</button>
-                <p style={{ marginTop: "15px", textAlign: "center", color: "#666" }}>
+                
+                <div className="input-group">
+                    <input
+                        className="glass-input"
+                        name="name"
+                        placeholder="Full Name"
+                        value={form.name}
+                        onChange={handleChange}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input
+                        className="glass-input"
+                        name="email"
+                        placeholder="Email Address"
+                        value={form.email}
+                        onChange={handleChange}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input
+                        className="glass-input"
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                    />
+                </div>
+                
+                <button className="btn-primary">Create Account</button>
+                
+                <div className="form-footer">
                     Already have an account? <Link to="/login">Login</Link>
-                </p>
+                </div>
             </form>
         </div>
     );
