@@ -1,37 +1,86 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/auth.css";
+import { useEffect, useState } from "react";
+import { getAllVehicles, purchaseVehicle } from "../api/vehicleApi";
+import VehicleCard from "../components/VehicleCard";
+import { toast } from "react-toastify";
 
 function Home() {
-    const [username, setUsername] = useState("");
-    const navigate = useNavigate();
+
+    const [vehicles, setVehicles] = useState([]);
 
     useEffect(() => {
-        const storedUsername = localStorage.getItem("username");
-        if (!storedUsername) {
-            navigate("/login");
-        } else {
-            setUsername(storedUsername);
-        }
-    }, [navigate]);
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        navigate("/login");
+        loadVehicles();
+
+    }, []);
+
+    const loadVehicles = async () => {
+
+        try{
+
+            const data = await getAllVehicles();
+
+            setVehicles(data);
+
+        }catch(error){
+
+            toast.error("Unable to load vehicles.");
+        }
     };
 
-    return (
-        <div className="auth-container">
-            <div className="auth-card" style={{ textAlign: "center", padding: "40px" }}>
-                <h2>Hello, {username}!</h2>
-                <p style={{ marginTop: "10px", marginBottom: "30px", color: "#666" }}>
-                    Welcome to the home page.
-                </p>
-                <button onClick={handleLogout}>Logout</button>
+    const handlePurchase = async(id)=>{
+
+        try{
+
+            await purchaseVehicle(id);
+
+            toast.success("Vehicle purchased successfully.");
+
+            loadVehicles();
+
+        }catch(error){
+
+            toast.error(error.response?.data?.message ||
+                "Purchase failed.");
+        }
+    };
+
+    return(
+
+        <div className="container">
+
+            <h2 style={{marginTop:"20px"}}>
+                Available Vehicles
+            </h2>
+
+            <div
+                style={{
+                    display:"flex",
+                    flexWrap:"wrap"
+                }}
+            >
+
+                {
+                    vehicles.map(vehicle=>(
+
+                        <VehicleCard
+
+                            key={vehicle.id}
+
+                            vehicle={vehicle}
+
+                            onPurchase={handlePurchase}
+
+                        />
+
+                    ))
+                }
+
             </div>
+
         </div>
+
     );
+
 }
 
 export default Home;

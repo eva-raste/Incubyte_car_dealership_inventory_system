@@ -1,0 +1,23 @@
+.vehicle-card{
+
+    border:1px solid #ccc;
+
+    padding:20px;
+
+    margin:15px;
+
+    border-radius:8px;
+
+    width:250px;
+
+    text-align:center;
+}
+
+.vehicle-card button{
+
+    margin-top:15px;
+
+    padding:8px 18px;
+
+    cursor:pointer;
+}
