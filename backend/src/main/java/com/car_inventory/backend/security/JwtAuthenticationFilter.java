@@ -37,29 +37,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        String email = jwtService.extractUsername(token);
+        try {
+            String email = jwtService.extractUsername(token);
 
-        if (email != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (email != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails user =
-                    userDetailsService.loadUserByUsername(email);
+                UserDetails user =
+                        userDetailsService.loadUserByUsername(email);
 
-            if (jwtService.isTokenValid(token, user.getUsername())) {
+                if (jwtService.isTokenValid(token, user.getUsername())) {
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                user.getAuthorities());
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    user.getAuthorities());
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request));
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
+                }
             }
+        } catch (Exception e) {
+            // Log error or simply proceed to let the request remain unauthenticated
         }
 
         filterChain.doFilter(request, response);

@@ -27,11 +27,12 @@ function Login() {
             // Save token and user name
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("username", response.data.name || form.email);
-            
+            localStorage.setItem("role", response.data.role);
             setForm({
                 email: "",
                 password: ""
             });
+            console.log()
             navigate("/home");
         } catch (err) {
             toast.error(err.response?.data?.message || "Login Failed");

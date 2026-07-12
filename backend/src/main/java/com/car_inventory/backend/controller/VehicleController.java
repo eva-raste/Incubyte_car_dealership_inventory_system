@@ -22,6 +22,7 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VehicleResponse> addVehicle(
             @Valid @RequestBody VehicleRequest request) {
 
@@ -65,6 +66,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VehicleResponse> updateVehicle(
             @PathVariable Long id,
             @Valid @RequestBody VehicleRequest request) {
