@@ -4,6 +4,9 @@ import VehicleCard from "../components/VehicleCard";
 import { toast } from "react-toastify";
 import SearchBar from "../components/SearchBar";
 import { searchVehicles } from "../api/vehicleApi";
+import VehicleForm from "../components/VehicleForm";
+
+
 function Home() {
 
     const [vehicles, setVehicles] = useState([]);
@@ -77,6 +80,10 @@ function Home() {
                 Available Vehicles
             </h2>
         
+            <VehicleForm
+                onVehicleAdded={loadVehicles}
+            />
+            
             <SearchBar onSearch={handleSearch} />
 
             <div

@@ -46,3 +46,20 @@ export const searchVehicles = async (params) => {
 
     return response.data;
 };
+
+export const addVehicle = async (vehicle) => {
+
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+        "/vehicles",
+        vehicle,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    return response.data;
+};
