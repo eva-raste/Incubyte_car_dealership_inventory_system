@@ -26,17 +26,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
 
+                .cors(Customizer.withDefaults())
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/api/auth/**")
-                        .permitAll()
-
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated())
 
                 .httpBasic(Customizer.withDefaults());
 
