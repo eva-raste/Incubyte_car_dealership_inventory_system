@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { getAllVehicles, purchaseVehicle } from "../api/vehicleApi";
 import VehicleCard from "../components/VehicleCard";
 import { toast } from "react-toastify";
-
+import SearchBar from "../components/SearchBar";
+import { searchVehicles } from "../api/vehicleApi";
 function Home() {
 
     const [vehicles, setVehicles] = useState([]);
@@ -44,6 +45,30 @@ function Home() {
         }
     };
 
+    const handleSearch = async (filters) => {
+
+    try {
+
+        const cleanedFilters = {};
+
+        Object.keys(filters).forEach(key => {
+            if (filters[key] !== "") {
+                cleanedFilters[key] = filters[key];
+            }
+        });
+
+        const data = await searchVehicles(cleanedFilters);
+
+        setVehicles(data);
+
+    } catch (error) {
+
+        toast.error("Search failed.");
+
+    }
+
+};
+
     return(
 
         <div className="container">
@@ -51,6 +76,8 @@ function Home() {
             <h2 style={{marginTop:"20px"}}>
                 Available Vehicles
             </h2>
+        
+            <SearchBar onSearch={handleSearch} />
 
             <div
                 style={{

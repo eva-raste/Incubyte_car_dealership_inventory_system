@@ -29,3 +29,20 @@ export const purchaseVehicle = async (id) => {
 
     return response.data;
 };
+
+export const searchVehicles = async (params) => {
+
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+        "/vehicles/search",
+        {
+            params,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    return response.data;
+};
