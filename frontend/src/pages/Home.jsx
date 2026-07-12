@@ -1,39 +1,44 @@
 import { useEffect, useState } from "react";
-import { getAllVehicles, purchaseVehicle } from "../api/vehicleApi";
+import {
+    getAllVehicles,
+    purchaseVehicle,
+    searchVehicles
+} from "../api/vehicleApi";
 import VehicleCard from "../components/VehicleCard";
-import { toast } from "react-toastify";
-import SearchBar from "../components/SearchBar";
-import { searchVehicles } from "../api/vehicleApi";
 import VehicleForm from "../components/VehicleForm";
-
+import SearchBar from "../components/SearchBar";
+import { toast } from "react-toastify";
 
 function Home() {
 
     const [vehicles, setVehicles] = useState([]);
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
 
     useEffect(() => {
-
         loadVehicles();
-
     }, []);
 
     const loadVehicles = async () => {
 
-        try{
+        try {
 
             const data = await getAllVehicles();
 
             setVehicles(data);
 
-        }catch(error){
+            setSelectedVehicle(null);
+
+        } catch (error) {
 
             toast.error("Unable to load vehicles.");
+
         }
+
     };
 
-    const handlePurchase = async(id)=>{
+    const handlePurchase = async (id) => {
 
-        try{
+        try {
 
             await purchaseVehicle(id);
 
@@ -41,73 +46,89 @@ function Home() {
 
             loadVehicles();
 
-        }catch(error){
+        } catch (error) {
 
-            toast.error(error.response?.data?.message ||
-                "Purchase failed.");
+            toast.error(
+                error.response?.data?.message ||
+                "Purchase failed."
+            );
+
         }
+
     };
 
     const handleSearch = async (filters) => {
 
-    try {
+        try {
 
-        const cleanedFilters = {};
+            const cleanedFilters = {};
 
-        Object.keys(filters).forEach(key => {
-            if (filters[key] !== "") {
-                cleanedFilters[key] = filters[key];
-            }
+            Object.keys(filters).forEach(key => {
+
+                if (filters[key] !== "") {
+
+                    cleanedFilters[key] = filters[key];
+
+                }
+
+            });
+
+            const data = await searchVehicles(cleanedFilters);
+
+            setVehicles(data);
+
+        } catch (error) {
+
+            toast.error("Search failed.");
+
+        }
+
+    };
+
+    const handleEdit = (vehicle) => {
+
+        setSelectedVehicle(vehicle);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
 
-        const data = await searchVehicles(cleanedFilters);
+    };
 
-        setVehicles(data);
-
-    } catch (error) {
-
-        toast.error("Search failed.");
-
-    }
-
-};
-
-    return(
+    return (
 
         <div className="container">
 
-            <h2 style={{marginTop:"20px"}}>
+            <h2 style={{ marginTop: "20px" }}>
                 Available Vehicles
             </h2>
-        
+
             <VehicleForm
+                isEdit={selectedVehicle !== null}
+                vehicle={selectedVehicle}
                 onVehicleAdded={loadVehicles}
             />
-            
+
             <SearchBar onSearch={handleSearch} />
 
             <div
                 style={{
-                    display:"flex",
-                    flexWrap:"wrap"
+                    display: "flex",
+                    flexWrap: "wrap"
                 }}
             >
 
-                {
-                    vehicles.map(vehicle=>(
+                {vehicles.map(vehicle => (
 
-                        <VehicleCard
+                    <VehicleCard
+                        key={vehicle.id}
+                        vehicle={vehicle}
+                        onPurchase={handlePurchase}
+                        onEdit={handleEdit}
+                    />
 
-                            key={vehicle.id}
-
-                            vehicle={vehicle}
-
-                            onPurchase={handlePurchase}
-
-                        />
-
-                    ))
-                }
+                ))}
 
             </div>
 

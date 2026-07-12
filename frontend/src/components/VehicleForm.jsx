@@ -1,26 +1,26 @@
 import { useState } from "react";
-import { addVehicle } from "../api/vehicleApi";
 import { toast } from "react-toastify";
+import { addVehicle, updateVehicle } from "../api/vehicleApi";
 
-function VehicleForm({ onVehicleAdded }) {
+function VehicleForm({
+    vehicle = null,
+    isEdit = false,
+    onVehicleAdded
+}) {
 
-    const [vehicle, setVehicle] = useState({
-
-        make: "",
-        model: "",
-        category: "SUV",
-        price: "",
-        quantity: ""
-
+    const [formData, setFormData] = useState({
+        make: vehicle?.make || "",
+        model: vehicle?.model || "",
+        category: vehicle?.category || "SUV",
+        price: vehicle?.price || "",
+        quantity: vehicle?.quantity || ""
     });
 
     const handleChange = (e) => {
-
-        setVehicle({
-            ...vehicle,
+        setFormData({
+            ...formData,
             [e.target.name]: e.target.value
         });
-
     };
 
     const handleSubmit = async (e) => {
@@ -29,11 +29,21 @@ function VehicleForm({ onVehicleAdded }) {
 
         try {
 
-            await addVehicle(vehicle);
+            if (isEdit) {
 
-            toast.success("Vehicle added successfully.");
+                await updateVehicle(vehicle.id, formData);
 
-            setVehicle({
+                toast.success("Vehicle updated successfully.");
+
+            } else {
+
+                await addVehicle(formData);
+
+                toast.success("Vehicle added successfully.");
+
+            }
+
+            setFormData({
                 make: "",
                 model: "",
                 category: "SUV",
@@ -49,7 +59,7 @@ function VehicleForm({ onVehicleAdded }) {
 
             toast.error(
                 error.response?.data?.message ||
-                "Unable to add vehicle."
+                "Operation failed."
             );
 
         }
@@ -60,13 +70,15 @@ function VehicleForm({ onVehicleAdded }) {
 
         <form onSubmit={handleSubmit}>
 
-            <h2>Add Vehicle</h2>
+            <h2>
+                {isEdit ? "Update Vehicle" : "Add Vehicle"}
+            </h2>
 
             <input
                 type="text"
                 name="make"
                 placeholder="Make"
-                value={vehicle.make}
+                value={formData.make}
                 onChange={handleChange}
                 required
             />
@@ -75,31 +87,29 @@ function VehicleForm({ onVehicleAdded }) {
                 type="text"
                 name="model"
                 placeholder="Model"
-                value={vehicle.model}
+                value={formData.model}
                 onChange={handleChange}
                 required
             />
 
             <select
                 name="category"
-                value={vehicle.category}
+                value={formData.category}
                 onChange={handleChange}
             >
-
                 <option value="SUV">SUV</option>
                 <option value="SEDAN">SEDAN</option>
                 <option value="HATCHBACK">HATCHBACK</option>
                 <option value="SPORTS">SPORTS</option>
                 <option value="TRUCK">TRUCK</option>
                 <option value="ELECTRIC">ELECTRIC</option>
-
             </select>
 
             <input
                 type="number"
                 name="price"
                 placeholder="Price"
-                value={vehicle.price}
+                value={formData.price}
                 onChange={handleChange}
                 required
             />
@@ -108,13 +118,13 @@ function VehicleForm({ onVehicleAdded }) {
                 type="number"
                 name="quantity"
                 placeholder="Quantity"
-                value={vehicle.quantity}
+                value={formData.quantity}
                 onChange={handleChange}
                 required
             />
 
             <button type="submit">
-                Add Vehicle
+                {isEdit ? "Update Vehicle" : "Add Vehicle"}
             </button>
 
         </form>

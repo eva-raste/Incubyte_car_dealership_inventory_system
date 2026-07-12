@@ -63,3 +63,20 @@ export const addVehicle = async (vehicle) => {
 
     return response.data;
 };
+
+export const updateVehicle = async (id, vehicle) => {
+
+    const token = localStorage.getItem("token");
+
+    const response = await axios.put(
+        `/vehicles/${id}`,
+        vehicle,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    return response.data;
+};
