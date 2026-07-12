@@ -38,14 +38,14 @@ describe('Login Component', () => {
             </BrowserRouter>
         );
 
-        expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Email Address')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
     });
 
     it('submits the form and navigates on successful login', async () => {
         login.mockResolvedValueOnce({
-            data: { message: 'Success', token: 'fake-token', name: 'TestUser' }
+            data: { message: 'Success', token: 'fake-token', name: 'TestUser', role: 'ADMIN' }
         });
 
         render(
@@ -54,7 +54,7 @@ describe('Login Component', () => {
             </BrowserRouter>
         );
 
-        fireEvent.change(screen.getByPlaceholderText('Email'), {
+        fireEvent.change(screen.getByPlaceholderText('Email Address'), {
             target: { value: 'test@test.com' }
         });
         fireEvent.change(screen.getByPlaceholderText('Password'), {
@@ -69,6 +69,7 @@ describe('Login Component', () => {
             expect(mockNavigate).toHaveBeenCalledWith('/home');
             expect(localStorage.getItem('token')).toBe('fake-token');
             expect(localStorage.getItem('username')).toBe('TestUser');
+            expect(localStorage.getItem('role')).toBe('ADMIN');
         });
     });
 

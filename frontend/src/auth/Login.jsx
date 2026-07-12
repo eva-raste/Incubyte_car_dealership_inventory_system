@@ -26,6 +26,7 @@ function Login() {
             
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("username", response.data.name || form.email);
+            localStorage.setItem("role", response.data.role);
             
             setForm({
                 email: "",
